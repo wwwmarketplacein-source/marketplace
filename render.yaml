@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: vantor-marketplace-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm run render:build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vantor-marketplace-db
+          property: connectionString
+
+databases:
+  - name: vantor-marketplace-db
+    databaseName: vantor_marketplace
+    user: vantor_marketplace_user

@@ -3,141 +3,97 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id              String      @id @default(cuid())
-  email           String      @unique
-  password        String
-  firstName       String
-  lastName        String
-  phoneNumber     String?
-  personalEmail   String?
-  role            String
-  isActive        Boolean     @default(true)
-  emailVerified   Boolean     @default(false)
-
-  company         Company?
-  kycRecord       KYCRecord?
-  projects        Project[]
-  bids            Bid[]
-
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String     @id @default(cuid())
+  email         String     @unique
+  password      String
+  firstName     String
+  lastName      String
+  phoneNumber   String?
+  personalEmail String?
+  role          UserRole
+  isActive      Boolean    @default(true)
+  emailVerified Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  company       Company?
+  kycRecord     KYCRecord?
 }
 
 model Company {
-  id                  String      @id @default(cuid())
-  legalName           String
-  tradingName         String?
-  registrationNumber  String      @unique
-  businessType        String
-  industry            String
-  addressLine1        String
-  city                String
-  postalCode          String
-  annualTurnover      Float?
-  companyEmail        String
-  phoneNumber1        String
-  phoneNumber2        String?
-  websiteUrl          String?
-
-  kybStatus           String @default("PENDING")
-
-  userId              String    @unique
-  user                User      @relation(fields: [userId], references: [id])
-
-  kybRecords          KYBRecord[]
-
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                 String      @id @default(cuid())
+  legalName          String
+  tradingName        String?
+  registrationNumber String      @unique
+  businessType       String
+  industry           String[]
+  addressLine1       String
+  city               String
+  postalCode         String
+  annualTurnover     Float?
+  companyEmail       String
+  phoneNumber1       String
+  phoneNumber2       String?
+  websiteUrl         String?
+  kybStatus          KYBStatus   @default(PENDING)
+  userId             String      @unique
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  user               User        @relation(fields: [userId], references: [id])
+  kybRecords         KYBRecord[]
 }
 
 model KYBRecord {
-  id              String      @id @default(cuid())
-
-  status          String      @default("PENDING")
+  id              String        @id @default(cuid())
+  status          KYBStatus     @default(PENDING)
   rejectionReason String?
-
   companyId       String
-  company         Company     @relation(fields: [companyId], references: [id])
-
+  submittedAt     DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   documents       KYBDocument[]
-
-  submittedAt     DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  company         Company       @relation(fields: [companyId], references: [id])
 }
 
 model KYBDocument {
-  id              String      @id @default(cuid())
-
-  docType         String
-  fileName        String
-  mimeType        String
-  fileSize        Int
-  cloudinaryUrl   String
-
-  kybRecordId     String
-  kybRecord       KYBRecord   @relation(fields: [kybRecordId], references: [id])
-
-  uploadedAt      DateTime    @default(now())
+  id            String    @id @default(cuid())
+  docType       String
+  fileName      String
+  mimeType      String
+  fileSize      Int
+  cloudinaryUrl String
+  kybRecordId   String
+  uploadedAt    DateTime  @default(now())
+  kybRecord     KYBRecord @relation(fields: [kybRecordId], references: [id])
 }
 
 model KYCRecord {
-  id              String      @id @default(cuid())
-
-  designation     String
-  phone           String
-  idType          String
-  idNumber        String
-  selfieFileName  String?
-  selfieUrl       String?
-
-  userId          String      @unique
-  user            User        @relation(fields: [userId], references: [id])
-
-  submittedAt     DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id             String   @id @default(cuid())
+  designation    String
+  phone          String
+  idType         String
+  idNumber       String
+  selfieFileName String?
+  selfieUrl      String?
+  userId         String   @unique
+  submittedAt    DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
 }
 
-model Project {
-  id              String        @id @default(cuid())
-
-  title           String
-  category        String
-  description     String
-  requirements    String?
-  minBudget       Float
-  maxBudget       Float
-  deadline        DateTime
-  ndaRequired     Boolean       @default(false)
-  status          String        @default("PUBLISHED")
-  skills          String
-
-  buyerId         String
-  buyer           User          @relation(fields: [buyerId], references: [id])
-
-  bids            Bid[]
-
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+enum KYBStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
-model Bid {
-  id              String        @id @default(cuid())
-
-  amount          Float
-  proposal        String
-  status          String        @default("SUBMITTED")
-
-  projectId       String
-  project         Project       @relation(fields: [projectId], references: [id])
-
-  vendorId        String
-  vendor          User          @relation(fields: [vendorId], references: [id])
-
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+enum UserRole {
+  ADMIN
+  BUYER
+  VENDOR
+  INVESTOR
 }

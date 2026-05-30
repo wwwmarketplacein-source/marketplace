@@ -8,6 +8,8 @@ import {
 } from "../validators/auth.validator";
 import { generateAccessToken } from "../utils/jwt";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const register = async (
   req: Request,
   res: Response
@@ -55,7 +57,11 @@ export const register = async (
 
             businessType: validatedData.businessType || "PRIVATE",
             
-            industry: validatedData.industry || "Technology",
+            industry: (
+              isProduction
+                ? [validatedData.industry || "Technology"]
+                : validatedData.industry || "Technology"
+            ) as any,
 
             addressLine1: "Pending",
             city: validatedData.country || "Pending",

@@ -21,9 +21,18 @@ const serializeSkills = (skills?: string[] | string) => {
   return splitSkills(skills).join(",");
 };
 
-const formatProject = <T extends { skills: string }>(project: T) => ({
+const storageSkills = (skills?: string[] | string) => {
+  const parsedSkills = splitSkills(skills);
+  return (process.env.NODE_ENV === "production"
+    ? parsedSkills
+    : parsedSkills.join(",")) as any;
+};
+
+const formatProject = <T extends { skills: string[] | string }>(project: T) => ({
   ...project,
-  skills: splitSkills(project.skills)
+  skills: Array.isArray(project.skills)
+    ? project.skills
+    : splitSkills(project.skills)
 });
 
 export const listProjects = async (
@@ -113,7 +122,7 @@ export const createProject = async (
         maxBudget: validatedData.maxBudget,
         deadline: validatedData.deadline,
         ndaRequired: validatedData.ndaRequired,
-        skills: serializeSkills(validatedData.skills),
+        skills: storageSkills(validatedData.skills),
         buyerId: req.user!.userId
       }
     });

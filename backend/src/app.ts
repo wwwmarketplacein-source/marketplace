@@ -25,9 +25,26 @@ const allowedOrigins = [
     .filter(Boolean)
 ];
 
+const isAllowedVercelPreview = (origin: string) => {
+  try {
+    const url = new URL(origin);
+    return (
+      url.protocol === "https:" &&
+      url.hostname.endsWith(".vercel.app") &&
+      url.hostname.startsWith("marketplace-")
+    );
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      isAllowedVercelPreview(origin)
+    ) {
       callback(null, true);
       return;
     }

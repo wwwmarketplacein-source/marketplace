@@ -54,7 +54,7 @@ export const register = async (
               validatedData.registrationNumber || `TEMP-${Date.now()}`,
 
             businessType: validatedData.businessType || "PRIVATE",
-
+            
             industry: validatedData.industry || "Technology",
 
             addressLine1: "Pending",

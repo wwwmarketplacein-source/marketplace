@@ -17,6 +17,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "https://marketplace-three-lyart.vercel.app",
+  "https://marketplace-2f3u7iyhg-wwwmarketplacein-2042s-projects.vercel.app",
+
   ...(process.env.FRONTEND_URL || "")
     .split(",")
     .map((origin) => origin.trim())
@@ -24,7 +26,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: true,
   credentials: true
 }));
 

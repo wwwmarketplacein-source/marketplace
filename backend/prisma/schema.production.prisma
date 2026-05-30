@@ -34,7 +34,7 @@ model Company {
   tradingName         String?
   registrationNumber  String      @unique
   businessType        String
-  industry            String[]
+  industry            String
   addressLine1        String
   city                String
   postalCode          String
@@ -113,7 +113,7 @@ model Project {
   deadline        DateTime
   ndaRequired     Boolean     @default(false)
   status          String      @default("PUBLISHED")
-  skills          String[]
+  skills          String
 
   buyerId         String
   buyer           User        @relation(fields: [buyerId], references: [id])
